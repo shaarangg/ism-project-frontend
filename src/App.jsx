@@ -1,7 +1,12 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
+import abi from "./abis/Piracy.json";
 import networks from "./utils/networks";
+
+const CONTRACT_ADDRESS = "0x74623dFDFbD24E40A82D29368486ba249CAF27A6";
+const CONTRACT_ABI = abi.abi;
+
 function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [network, setNetwork] = useState("");
@@ -39,14 +44,32 @@ function App() {
     }
 
     const chainId = await ethereum.request({ method: "eth_chainId" });
-    setNetwork(networks[chainId]);
-
-    ethereum.on("chainChanged", handleChainChanged);
-
     const handleChainChanged = (_chain) => {
       setNetwork(networks[chainId]);
       window.location.reload();
     };
+    setNetwork(networks[chainId]);
+
+    ethereum.on("chainChanged", handleChainChanged);
+  };
+  const checkAdmin = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          CONTRACT_ABI,
+          signer
+        );
+        const address = await signer.getAddress();
+        let tx = await contract.checkIsAdmin(address);
+        console.log(tx);
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const notConnectedContainer = () => {
@@ -57,6 +80,7 @@ function App() {
     );
   };
   const connectedContainer = () => {
+    checkAdmin();
     return <div>You are successfully connected</div>;
   };
 
