@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { GlobalContext } from "../context";
+import { useNavigate } from "react-router-dom";
 function Connected() {
+    const navigate = useNavigate();
     const { checkAdmin } = GlobalContext();
-    const admin = checkAdmin();
-    return <div>You are successfully connected</div>;
+    useEffect(() => {
+        const admin = checkAdmin();
+        if (admin) {
+            navigate("/admin");
+        } else {
+            navigate("/user");
+        }
+    }, []);
+    return <div>Loading...</div>;
 }
 
 export default Connected;
