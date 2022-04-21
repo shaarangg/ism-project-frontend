@@ -5,7 +5,6 @@ import networks from "./utils/networks";
 function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [network, setNetwork] = useState("");
-  const [loading, setLoading] = useState(true);
 
   const connectWallet = async () => {
     try {
@@ -50,15 +49,30 @@ function App() {
     };
   };
 
+  const notConnectedContainer = () => {
+    return (
+      <div>
+        <button onClick={connectWallet}>Connect Wallet</button>
+      </div>
+    );
+  };
+  const connectedContainer = () => {
+    return <div>You are successfully connected</div>;
+  };
+
   useEffect(() => {
     checkWalletConnected();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  } else {
-    <div>Hello welcome to my app</div>;
-  }
+  return (
+    <div className="App">
+      <div className="container">
+        <h1>Welcome to our project</h1>
+        {!currentAccount && notConnectedContainer()}
+        {currentAccount && connectedContainer()}
+      </div>
+    </div>
+  );
 }
 
 export default App;
