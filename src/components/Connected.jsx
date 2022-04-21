@@ -2,7 +2,7 @@ import React from "react";
 import { GlobalContext } from "../context";
 function Connected() {
     const { checkAdmin } = GlobalContext();
-    checkAdmin();
+    const admin = checkAdmin();
     return <div>You are successfully connected</div>;
 }
 

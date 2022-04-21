@@ -1,22 +1,17 @@
-import React, { useEffect } from "react";
-import { GlobalContext } from "./context";
-import Connected from "./components/Connected";
-import NotConnected from "./components/NotConnected";
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import User from "./pages/User";
+import Admin from "./pages/Admin";
 function App() {
-    const { checkWalletConnected, currentAccount } = GlobalContext();
-
-    useEffect(() => {
-        checkWalletConnected();
-    }, []);
-
     return (
         <div className="App">
-            <div className="container">
-                <h1>Welcome to our project</h1>
-                {!currentAccount && <NotConnected />}
-                {currentAccount && <Connected />}
-            </div>
+            <BrowserRouter>
+                <Routes>
+                    <Route exact path="/" element={<Home />} />
+                    <Route exact path="/user" element={<User />} />
+                    <Route exact path="/admin" element={<Admin />} />
+                </Routes>
+            </BrowserRouter>
         </div>
     );
 }

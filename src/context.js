@@ -67,7 +67,7 @@ export function AppProvider({ children }) {
                 );
                 const address = await signer.getAddress();
                 let tx = await contract.checkIsAdmin(address);
-                console.log(tx);
+                return tx;
             }
         } catch (e) {
             console.log(e);
