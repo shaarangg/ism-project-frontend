@@ -187,3 +187,34 @@ label {
 .date {
     color: var(--main-color-dark);
 }
+.btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7rem;
+    margin-top: 2rem;
+}
+.accept-btn,
+.delete-btn {
+    padding: 0.5rem 0.75rem;
+    display: inline-block;
+    border: 2px solid var(--clr-black);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+.accept-btn {
+    background-color: var(--clr-green-light);
+}
+.accept-btn:hover {
+    background-color: var(--clr-green-dark);
+}
+.delete-btn {
+    background-color: var(--clr-red-light);
+}
+.delete-btn:hover {
+    background-color: var(--clr-red-dark);
+}

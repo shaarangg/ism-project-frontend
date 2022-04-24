@@ -16,6 +16,8 @@ export function AppProvider({ children }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const [files, setFiles] = useState([]);
+    const [admin, setAdmin] = useState(null);
+    const [pendingFiles, setPendingFiles] = useState([]);
     const connectWallet = async () => {
         try {
             const { ethereum } = window;
@@ -71,7 +73,7 @@ export function AppProvider({ children }) {
             if (ethereum) {
                 const address = await signer.getAddress();
                 const tx = await con.checkIsAdmin(address);
-                return tx;
+                setAdmin(tx);
             }
         } catch (e) {
             console.log(e);
@@ -95,7 +97,7 @@ export function AppProvider({ children }) {
             contentRef.current.value = "";
             setDisabled(false);
             closeModal();
-            console.log("Response", res.status);
+            getAllFiles();
         } catch (e) {
             console.log(e);
         }
@@ -105,7 +107,7 @@ export function AppProvider({ children }) {
         const allFiles = await contract.current.getAllFiles();
         const approvedFiles = allFiles.map(async (file) => {
             const add = await contract.current.getFileOwner(file);
-            if (add == currentAccount) {
+            if (add === currentAccount) {
                 return {
                     status: "approved",
                     name: file,
@@ -122,10 +124,31 @@ export function AppProvider({ children }) {
         ];
         setFiles(files);
     };
-
+    const fetchRequests = async () => {
+        try {
+            const pendingAddresses =
+                await contract.current.getPendingAddresses();
+            let pf = [];
+            for (let i = 0; i < pendingAddresses.length; i++) {
+                const name = await contract.current.getPendingFileFromAddress(
+                    pendingAddresses[i]
+                );
+                pf.push({
+                    address: pendingAddresses[i],
+                    file: name,
+                });
+            }
+            setPendingFiles(pf);
+        } catch (e) {
+            console.log(e);
+        }
+    };
     return (
         <ContextAPI.Provider
             value={{
+                fetchRequests,
+                pendingFiles,
+                admin,
                 files,
                 getAllFiles,
                 isModalOpen,

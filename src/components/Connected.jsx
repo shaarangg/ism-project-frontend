@@ -3,15 +3,15 @@ import { GlobalContext } from "../context";
 import { useNavigate } from "react-router-dom";
 function Connected() {
     const navigate = useNavigate();
-    const { checkAdmin } = GlobalContext();
+    const { checkAdmin, admin } = GlobalContext();
     useEffect(() => {
-        const admin = checkAdmin();
+        checkAdmin();
         if (admin === true) {
             navigate("/admin");
-        } else {
+        } else if (admin === false) {
             navigate("/user");
         }
-    }, []);
+    }, [admin]);
     return <div>Loading...</div>;
 }
 

@@ -13,7 +13,6 @@ function User() {
             getAllFiles();
         }
     }, []);
-    console.log(files);
     return (
         <>
             <Modal />
