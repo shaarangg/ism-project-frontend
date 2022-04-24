@@ -2,7 +2,13 @@ import React, { useEffect } from "react";
 import { GlobalContext } from "../context";
 import { useNavigate } from "react-router-dom";
 function Admin() {
-    const { currentAccount, pendingFiles, fetchRequests } = GlobalContext();
+    const {
+        currentAccount,
+        pendingFiles,
+        fetchRequests,
+        rejectRequest,
+        approveRequest,
+    } = GlobalContext();
     const navigate = useNavigate();
     useEffect(() => {
         if (!currentAccount) {
@@ -40,14 +46,16 @@ function Admin() {
                             <button
                                 type="button"
                                 className="accept-btn"
-                                // onClick={openModal}
+                                onClick={() => approveRequest(address)}
                             >
                                 Approve
                             </button>{" "}
                             <button
                                 type="button"
                                 className="delete-btn"
-                                // onClick={openModal}
+                                onClick={() => {
+                                    rejectRequest(address);
+                                }}
                             >
                                 Reject
                             </button>

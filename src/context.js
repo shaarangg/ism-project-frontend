@@ -126,9 +126,10 @@ export function AppProvider({ children }) {
     };
     const fetchRequests = async () => {
         try {
-            const pendingAddresses =
-                await contract.current.getPendingAddresses();
+            let pendingAddresses = await contract.current.getPendingAddresses();
+            pendingAddresses = [...new Set(pendingAddresses)];
             let pf = [];
+            console.log(pendingAddresses.length);
             for (let i = 0; i < pendingAddresses.length; i++) {
                 const name = await contract.current.getPendingFileFromAddress(
                     pendingAddresses[i]
@@ -143,9 +144,27 @@ export function AppProvider({ children }) {
             console.log(e);
         }
     };
+    const rejectRequest = async (add) => {
+        try {
+            await contract.current.deleteFile(add);
+            fetchRequests();
+        } catch (e) {
+            console.log(e);
+        }
+    };
+    const approveRequest = async (add) => {
+        try {
+            await contract.current.approve(add);
+            fetchRequests();
+        } catch (e) {
+            console.log(e);
+        }
+    };
     return (
         <ContextAPI.Provider
             value={{
+                approveRequest,
+                rejectRequest,
                 fetchRequests,
                 pendingFiles,
                 admin,
