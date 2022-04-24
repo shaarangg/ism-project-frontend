@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import abi from "./abis/Piracy.json";
 import networks from "./utils/networks";
 
-const CONTRACT_ADDRESS = "0x74623dFDFbD24E40A82D29368486ba249CAF27A6";
+const CONTRACT_ADDRESS = "0x3A33136C37D9fb33de487c6e3912E0742449c00E";
 const CONTRACT_ABI = abi.abi;
 
 const ContextAPI = React.createContext();
@@ -11,7 +11,7 @@ const ContextAPI = React.createContext();
 export function AppProvider({ children }) {
     const [currentAccount, setCurrentAccount] = useState("");
     const [network, setNetwork] = useState("");
-
+    const [walletAddress, setWalletAddress] = useState("Connect Wallet");
     const connectWallet = async () => {
         try {
             const { ethereum } = window;
@@ -65,8 +65,9 @@ export function AppProvider({ children }) {
                     CONTRACT_ABI,
                     signer
                 );
+                setWalletAddress((await signer.getAddress()).toString());
                 const address = await signer.getAddress();
-                let tx = await contract.checkIsAdmin(address);
+                const tx = await contract.checkIsAdmin(address);
                 return tx;
             }
         } catch (e) {
@@ -76,6 +77,7 @@ export function AppProvider({ children }) {
     return (
         <ContextAPI.Provider
             value={{
+                walletAddress,
                 checkWalletConnected,
                 currentAccount,
                 checkAdmin,

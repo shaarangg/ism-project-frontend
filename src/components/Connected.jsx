@@ -6,7 +6,7 @@ function Connected() {
     const { checkAdmin } = GlobalContext();
     useEffect(() => {
         const admin = checkAdmin();
-        if (admin) {
+        if (admin === true) {
             navigate("/admin");
         } else {
             navigate("/user");
