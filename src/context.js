@@ -15,6 +15,7 @@ export function AppProvider({ children }) {
     const contentRef = useRef("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [disabled, setDisabled] = useState(false);
+    const [files, setFiles] = useState([]);
     const connectWallet = async () => {
         try {
             const { ethereum } = window;
@@ -94,15 +95,39 @@ export function AppProvider({ children }) {
             contentRef.current.value = "";
             setDisabled(false);
             closeModal();
-            console.log(res.status);
+            console.log("Response", res.status);
         } catch (e) {
             console.log(e);
         }
     };
 
+    const getAllFiles = async () => {
+        const allFiles = await contract.current.getAllFiles();
+        const approvedFiles = allFiles.map(async (file) => {
+            const add = await contract.current.getFileOwner(file);
+            if (add == currentAccount) {
+                return {
+                    status: "approved",
+                    name: file,
+                };
+            }
+            return;
+        });
+        const pendingFile = await contract.current.getPendingFileFromAddress(
+            currentAccount
+        );
+        const files = [
+            ...approvedFiles,
+            { status: "pending", name: pendingFile },
+        ];
+        setFiles(files);
+    };
+
     return (
         <ContextAPI.Provider
             value={{
+                files,
+                getAllFiles,
                 isModalOpen,
                 disabled,
                 openModal,

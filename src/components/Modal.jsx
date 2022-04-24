@@ -12,16 +12,13 @@ function Modal() {
         >
             <div className="modal-container">
                 <form className="form" onSubmit={handleSubmit}>
-                    <label htmlFor="content">Content</label>
-                    <textarea
+                    <input
                         name="content"
                         className="input"
-                        placeholder="Add content"
+                        placeholder="Add link to the file"
                         id="content"
                         ref={contentRef}
-                        cols="100"
-                        rows="20"
-                    ></textarea>
+                    ></input>
                     <button type="submit" className="btn modal-btn">
                         Submit
                     </button>
