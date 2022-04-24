@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { ethers } from "ethers";
 import abi from "./abis/Piracy.json";
 import networks from "./utils/networks";
@@ -11,7 +11,10 @@ const ContextAPI = React.createContext();
 export function AppProvider({ children }) {
     const [currentAccount, setCurrentAccount] = useState("");
     const [network, setNetwork] = useState("");
-    const [walletAddress, setWalletAddress] = useState("Connect Wallet");
+    const contract = useRef();
+    const contentRef = useRef("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [disabled, setDisabled] = useState(false);
     const connectWallet = async () => {
         try {
             const { ethereum } = window;
@@ -23,7 +26,6 @@ export function AppProvider({ children }) {
             const accounts = await ethereum.request({
                 method: "eth_requestAccounts",
             });
-            console.log("Connected: ", accounts[0]);
             setCurrentAccount(accounts[0]);
         } catch (e) {
             console.log(e);
@@ -57,27 +59,56 @@ export function AppProvider({ children }) {
     const checkAdmin = async () => {
         try {
             const { ethereum } = window;
+            const provider = new ethers.providers.Web3Provider(ethereum);
+            const signer = provider.getSigner();
+            const con = new ethers.Contract(
+                CONTRACT_ADDRESS,
+                CONTRACT_ABI,
+                signer
+            );
+            contract.current = con;
             if (ethereum) {
-                const provider = new ethers.providers.Web3Provider(ethereum);
-                const signer = provider.getSigner();
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    CONTRACT_ABI,
-                    signer
-                );
-                setWalletAddress((await signer.getAddress()).toString());
                 const address = await signer.getAddress();
-                const tx = await contract.checkIsAdmin(address);
+                const tx = await con.checkIsAdmin(address);
                 return tx;
             }
         } catch (e) {
             console.log(e);
         }
     };
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleSubmit = async (e) => {
+        try {
+            e.preventDefault();
+            setDisabled(true);
+            const res = await contract.current.addFile(
+                contentRef.current.value
+            );
+            contentRef.current.value = "";
+            setDisabled(false);
+            closeModal();
+            console.log(res.status);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     return (
         <ContextAPI.Provider
             value={{
-                walletAddress,
+                isModalOpen,
+                disabled,
+                openModal,
+                closeModal,
+                contentRef,
+                handleSubmit,
                 checkWalletConnected,
                 currentAccount,
                 checkAdmin,
