@@ -3,8 +3,10 @@ import { GlobalContext } from "../context";
 function NotConnected() {
     const { connectWallet } = GlobalContext();
     return (
-        <div>
-            <button onClick={connectWallet}>Connect Wallet</button>
+        <div className="home-container">
+            <button className="home-btn" onClick={connectWallet}>
+                Connect Wallet
+            </button>
         </div>
     );
 }

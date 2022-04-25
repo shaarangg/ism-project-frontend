@@ -11,7 +11,9 @@ function Home() {
     return (
         <div className="App">
             <div className="container">
-                <h1>Welcome to our project</h1>
+                <h1 className="home-title">
+                    Prevention of Software Piracy Using Smart Contracts
+                </h1>
                 {!currentAccount && <NotConnected />}
                 {currentAccount && <Connected />}
             </div>

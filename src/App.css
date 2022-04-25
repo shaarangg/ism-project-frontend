@@ -218,3 +218,32 @@ label {
 .delete-btn:hover {
     background-color: var(--clr-red-dark);
 }
+.home-title {
+    font-size: 3rem;
+    text-align: center;
+    margin-top: 10rem;
+}
+.home-btn {
+    background-color: var(--highlight-color-dark);
+    color: black;
+    border: transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    letter-spacing: 0.1rem;
+    padding: 0.9rem 4rem;
+    margin-top: 3rem;
+    transition: var(--transition);
+    text-align: center;
+}
+.home-btn:hover {
+    background-color: var(--highlight-color-light);
+}
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column;
+    gap: 5rem;
+}
