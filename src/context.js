@@ -64,11 +64,7 @@ export function AppProvider({ children }) {
             const { ethereum } = window;
             const provider = new ethers.providers.Web3Provider(ethereum);
             const signer = provider.getSigner();
-            const con = new ethers.Contract(
-                CONTRACT_ADDRESS,
-                CONTRACT_ABI,
-                signer
-            );
+            const con = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
             contract.current = con;
             if (ethereum) {
                 const address = await signer.getAddress();
@@ -91,9 +87,7 @@ export function AppProvider({ children }) {
         try {
             e.preventDefault();
             setDisabled(true);
-            const res = await contract.current.addFile(
-                contentRef.current.value
-            );
+            const res = await contract.current.addFile(contentRef.current.value);
             contentRef.current.value = "";
             setDisabled(false);
             closeModal();
@@ -103,37 +97,44 @@ export function AppProvider({ children }) {
         }
     };
 
-    const getAllFiles = async () => {
-        const allFiles = await contract.current.getAllFiles();
-        const approvedFiles = allFiles.map(async (file) => {
-            const add = await contract.current.getFileOwner(file);
-            if (add === currentAccount) {
-                return {
-                    status: "approved",
-                    name: file,
-                };
-            }
-            return;
-        });
-        const pendingFile = await contract.current.getPendingFileFromAddress(
-            currentAccount
-        );
-        const files = [
-            ...approvedFiles,
-            { status: "pending", name: pendingFile },
-        ];
-        setFiles(files);
+    const getAllFiles = () => {
+        try {
+            const allFilesPromise = contract.current.getAllFiles();
+            const allFiles = allFilesPromise.then((res) => {
+                const approvedFiles = res.map((file) => {
+                    const add = contract.current.getFileOwner(file);
+                    add.then((res) => {
+                        if (res === currentAccount) {
+                            return {
+                                status: "approved",
+                                name: file,
+                            };
+                        }
+                    });
+                    return;
+                });
+                return approvedFiles;
+            });
+            const pendingFile = contract.current.getPendingFileFromAddress(currentAccount);
+            pendingFile.then((res) => {
+                let f = [];
+                for (let i = 0; i < allFiles.length; i++) {
+                    f.push(allFiles[i]);
+                }
+                if (res) f.push({ status: "pending", name: res });
+                setFiles(f);
+            });
+        } catch (e) {
+            console.log(e);
+        }
     };
     const fetchRequests = async () => {
         try {
             let pendingAddresses = await contract.current.getPendingAddresses();
             pendingAddresses = [...new Set(pendingAddresses)];
             let pf = [];
-            console.log(pendingAddresses.length);
             for (let i = 0; i < pendingAddresses.length; i++) {
-                const name = await contract.current.getPendingFileFromAddress(
-                    pendingAddresses[i]
-                );
+                const name = await contract.current.getPendingFileFromAddress(pendingAddresses[i]);
                 pf.push({
                     address: pendingAddresses[i],
                     file: name,
