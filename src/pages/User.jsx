@@ -20,11 +20,7 @@ function User() {
                 <Files files={files} />
             </main>
             <div className="add-blog">
-                <button
-                    type="button"
-                    className="btn add-blog-btn"
-                    onClick={openModal}
-                >
+                <button type="button" className="btn add-blog-btn" onClick={openModal}>
                     Add File
                 </button>
             </div>

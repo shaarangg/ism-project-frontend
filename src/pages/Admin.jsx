@@ -2,13 +2,7 @@ import React, { useEffect } from "react";
 import { GlobalContext } from "../context";
 import { useNavigate } from "react-router-dom";
 function Admin() {
-    const {
-        currentAccount,
-        pendingFiles,
-        fetchRequests,
-        rejectRequest,
-        approveRequest,
-    } = GlobalContext();
+    const { currentAccount, pendingFiles, fetchRequests, rejectRequest, approveRequest } = GlobalContext();
     const navigate = useNavigate();
     useEffect(() => {
         if (!currentAccount) {
@@ -37,17 +31,11 @@ function Admin() {
                             <div className="index">
                                 <p>{idx + 1}</p>
                             </div>
-                            <div className="status">
-                                Wallet Address: {address}
-                            </div>
+                            <div className="status">Wallet Address: {address}</div>
                         </div>
                         <div className="name">{file}</div>
                         <div className="btn-container">
-                            <button
-                                type="button"
-                                className="accept-btn"
-                                onClick={() => approveRequest(address)}
-                            >
+                            <button type="button" className="accept-btn" onClick={() => approveRequest(address)}>
                                 Approve
                             </button>{" "}
                             <button

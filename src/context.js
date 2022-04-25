@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import abi from "./abis/Piracy.json";
 import networks from "./utils/networks";
 
-const CONTRACT_ADDRESS = "0x3A33136C37D9fb33de487c6e3912E0742449c00E";
+const CONTRACT_ADDRESS = "0xDeD20f4Ea98732840084389CE1B75540539E235D";
 const CONTRACT_ABI = abi.abi;
 
 const ContextAPI = React.createContext();
@@ -96,34 +96,25 @@ export function AppProvider({ children }) {
             console.log(e);
         }
     };
-
-    const getAllFiles = () => {
+    const getAllFiles = async () => {
         try {
-            const allFilesPromise = contract.current.getAllFiles();
-            const allFiles = allFilesPromise.then((res) => {
-                const approvedFiles = res.map((file) => {
-                    const add = contract.current.getFileOwner(file);
-                    add.then((res) => {
-                        if (res === currentAccount) {
-                            return {
-                                status: "approved",
-                                name: file,
-                            };
-                        }
-                    });
-                    return;
-                });
-                return approvedFiles;
-            });
-            const pendingFile = contract.current.getPendingFileFromAddress(currentAccount);
-            pendingFile.then((res) => {
-                let f = [];
-                for (let i = 0; i < allFiles.length; i++) {
-                    f.push(allFiles[i]);
+            const allFiles = await contract.current.getAllFiles();
+            const approvedFilesPromise = allFiles.map(async (f) => {
+                const add = await contract.current.getFileOwner(f);
+                const x = add.toLowerCase();
+                if (x === currentAccount) {
+                    return { status: "approved", name: f };
                 }
-                if (res) f.push({ status: "pending", name: res });
-                setFiles(f);
+                return {};
             });
+            let approvedFiles = await Promise.all(approvedFilesPromise);
+            approvedFiles = approvedFiles.filter((f) => Object.keys(f).length !== 0);
+            const pendingFile = await contract.current.getPendingFileFromAddress(currentAccount);
+            if (pendingFile) {
+                console.log(pendingFile);
+                approvedFiles.push({ status: "pending", name: pendingFile });
+            }
+            setFiles(approvedFiles);
         } catch (e) {
             console.log(e);
         }
@@ -135,10 +126,11 @@ export function AppProvider({ children }) {
             let pf = [];
             for (let i = 0; i < pendingAddresses.length; i++) {
                 const name = await contract.current.getPendingFileFromAddress(pendingAddresses[i]);
-                pf.push({
-                    address: pendingAddresses[i],
-                    file: name,
-                });
+                if (name)
+                    pf.push({
+                        address: pendingAddresses[i],
+                        file: name,
+                    });
             }
             setPendingFiles(pf);
         } catch (e) {
@@ -147,8 +139,8 @@ export function AppProvider({ children }) {
     };
     const rejectRequest = async (add) => {
         try {
-            await contract.current.deleteFile(add);
-            fetchRequests();
+            const res = await contract.current.deleteFile(add);
+            console.log(res);
         } catch (e) {
             console.log(e);
         }
@@ -156,7 +148,6 @@ export function AppProvider({ children }) {
     const approveRequest = async (add) => {
         try {
             await contract.current.approve(add);
-            fetchRequests();
         } catch (e) {
             console.log(e);
         }
